@@ -1,5 +1,3 @@
-# technical-challenge-api
-
 # Preface
 
 The following documentation is a part of a practice challenge to display the use and understanding of Markdown, Lucid Charts, Swagger tools, the OpenAPI standard, GitHub, and GitHub Pages.
@@ -13,8 +11,6 @@ This repository contains the documentation for [Example.com](https://example.com
 
 - [Overview](#1-overview)
 - [Authentication](#2-authentication)
-  - [Browser-based authentication](#21-browser-based-authentication)
-  - [Self-issued access tokens](#22-self-issued-access-tokens)
 - [Resources](#3-resources)
   - [Users](#31-users)
   - [Publications](#32-publications)
@@ -24,165 +20,24 @@ This repository contains the documentation for [Example.com](https://example.com
 
 ## 1. Overview
 
-Medium’s API is a JSON-based OAuth2 API. All requests are made to endpoints beginning:
-`https://api.medium.com/v1`
+Example’s API is a JSON-based OAuth2 API. All requests are made to endpoints beginning:
+`https://example.com/api/v1`
 
 All requests must be secure, i.e. `https`, not `http`.
 
-#### Developer agreement
+<div style="width: 640px; height: 480px; margin: 10px; position: relative;"><iframe allowfullscreen frameborder="0" style="width:640px; height:480px" src="https://lucid.app/documents/embeddedchart/ed709c38-53e0-46cd-b303-cfc6bfecefb6" id=".KHqAVJ2E1F6"></iframe></div>
 
-By using Medium’s API, you agree to our [terms of service](https://medium.com/@feerst/2b405a832a2f).
+
 
 ## 2. Authentication
 
-In order to publish on behalf of a Medium account, you will need an access token. An access token grants limited access to a user’s account. We offer two ways to acquire an access token: browser-based OAuth authentication, and self-issued access tokens.
+An OAuth flow grants the access token, which contains the customerID.
 
-We recommend using self-issued access tokens. Browser-based authentication is supported **for existing integrations only**.
+Customer IDs are in the v4 UUID format, for example:
+`043fa14b-f6b5-4b96-9cd3-b5f0819b6283`
 
-###  2.1. Self-issued access tokens
 
-Self-issued access tokens (described in user-facing copy as integration tokens) are explicitly designed for desktop integrations where implementing browser-based authentication is non-trivial, or software like plugins where it is impossible to secure a client secret. You should not request that a user give you an integration token if you don’t meet these criteria. Users will be cautioned within Medium to treat integration tokens like passwords, and dissuaded from making them generally available.
-
-Users can request an access token by emailing yourfriends@medium.com. We will then grant access on the [Settings page](https://medium.com/me/settings) of their Medium account.
-
-You should instruct your user to visit this URL and generate an integration token from the `Integration Tokens` section. You should suggest a description for this
-token - typically the name of your product or feature - and use it consistently for all users.
-
-Self-issued access tokens do not expire, though they may be revoked by the user at any time.
-
-### 2.2. Browser-based authentication
-
-**IMPORTANT:** We don't allow any new integrations with our API.
-
-If you already have an existing integration, the first step is to acquire a short term authorization code by sending the user to our authorization URL so they can grant access to your integration.
-
-```
-https://medium.com/m/oauth/authorize?client_id={{clientId}}
-    &scope=basicProfile,publishPost
-    &state={{state}}
-    &response_type=code
-    &redirect_uri={{redirectUri}}
-```
-
-With the following parameters:
-
-| Parameter       | Type     | Required?  | Description                                     |
-| -------------   |----------|------------|-------------------------------------------------|
-| `client_id`     | string   | required   | The clientId we will supply you that identifies your integration. |
-| `scope`         | string   | required   | The access that your integration is requesting, comma separated. Currently, there are three valid scope values, which are listed below. Most integrations should request `basicProfile` and `publishPost` |
-| `state`         | string   | required   | Arbitrary text of your choosing, which we will repeat back to you to help you prevent request forgery. |
-| `response_type` | string   | required   | The field currently has only one valid value, and should be `code`.  |
-| `redirect_uri`  | string   | required   | The URL where we will send the user after they have completed the login dialog. This must exactly match one of the callback URLs you provided when creating your app. This field should be URL encoded. |
-
-The following scope values are valid:
-
-| Scope              | Description                                                             | Extended |
-| -------------------| ----------------------------------------------------------------------- | -------- |
-| basicProfile       | Grants basic access to a user’s profile (not including their email).    | No       |
-| listPublications   | Grants the ability to list publications related to the user.            | No       |
-| publishPost        | Grants the ability to publish a post to the user’s profile.             | No       |
-| uploadImage        | Grants the ability to upload an image for use within a Medium post.     | Yes      |
-
-Integrations are not permitted to request extended scope from users without explicit prior permission from Medium. Attempting to request these permissions through the standard user authentication flow will result in an error if extended scope has not been authorized for an integration.
-
-If the user grants your request for access, we will send them back to the specified `redirect_uri` with a state and code parameter:
-
-```
-https://example.com/callback/medium?state={{state}}
-    &code={{code}}
-```
-
-With the following parameters:
-
-| Parameter       | Type     | Required?  | Description                                     |
-| -------------   |----------|------------|-------------------------------------------------|
-| `state`         | string   | required   | The state you specified in the request.         |
-| `code`          | string   | required   | A short-lived authorization code that may be exchanged for an access token. |
-
-If the user declines access, we will send them back to the specified `redirect_uri` with an error parameter:
-
-```
-https://example.com/callback/medium?error=access_denied
-```
-
-Once you have an authorization code, you may exchange it for a long-lived access token with which you can make authenticated requests on behalf of the user. To acquire an access token, make a form-encoded server-side POST request:
-
-```
-POST /v1/tokens HTTP/1.1
-Host: api.medium.com
-Content-Type: application/x-www-form-urlencoded
-Accept: application/json
-Accept-Charset: utf-8
-
-code={{code}}&client_id={{client_id}}&client_secret={{client_secret}}&grant_type=authorization_code&redirect_uri={{redirect_uri}}
-```
-
-With the following parameters:
-
-| Parameter       | Type     | Required?  | Description                                     |
-| -------------   |----------|------------|-------------------------------------------------|
-| `code`          | string   | required   | The authorization code you received in the previous step. |
-| `client_id`     | string   | required   | Your integration’s `clientId` |
-| `client_secret` | string   | required   | Your integration’s `clientSecret` |
-| `grant_type`    | string   | required   | The literal string "authorization_code" |
-| `redirect_uri`  | string   | required   | The same redirect_uri you specified when requesting an authorization code. |
-
-If successful, you will receive back an access token response:
-
-```
-HTTP/1.1 201 OK
-Content-Type: application/json; charset=utf-8
-
-{
-  "token_type": "Bearer",
-  "access_token": {{access_token}},
-  "refresh_token": {{refresh_token}},
-  "scope": {{scope}},
-  "expires_at": {{expires_at}}
-}
-```
-
-With the following parameters:
-
-| Parameter       | Type         | Required?  | Description                                     |
-| -------------   |--------------|------------|-------------------------------------------------|
-| `token_type`    | string       | required   | The literal string "Bearer"                     |
-| `access_token`  | string       | required   | A token that is valid for 60 days and may be used to perform authenticated requests on behalf of the user. |
-| `refresh_token` | string       | required   | A token that does not expire which may be used to acquire a new `access_token`.                            |
-| `scope`         | string array | required   | The scopes granted to your integration.         |
-| `expires_at`    | int64        | required   | The timestamp in unix time when the access token will expire |
-
-Each access token is valid for 60 days. When an access token expires, you may request a new token using the refresh token. Refresh tokens do not expire. Both access tokens and refresh tokens may be revoked by the user at any time. **You must treat both access tokens and refresh tokens like passwords and store them securely.**
-
-Both access tokens and refresh tokens are consecutive strings of hex digits, like this:
-
-```
-181d415f34379af07b2c11d144dfbe35d
-```
-
-To acquire a new access token using a refresh token, make the following form-encoded request:
-
-```
-POST /v1/tokens HTTP/1.1
-Host: api.medium.com
-Content-Type: application/x-www-form-urlencoded
-Accept: application/json
-Accept-Charset: utf-8
-
-refresh_token={{refresh_token}}&client_id={{client_id}}
-&client_secret={{client_secret}}&grant_type=refresh_token
-```
-
-With the following parameters:
-
-| Parameter       | Type     | Required?  | Description                                     |
-| -------------   |----------|------------|-------------------------------------------------|
-| `refresh_token` | string   | required   | A valid refresh token.                          |
-| `client_id`     | string   | required   | Your integration’s `clientId`                   |
-| `client_secret` | string   | required   | Your integration’s `clientSecret`               |
-| `grant_type`    | string   | required   | The literal string "refresh_token"              |
-
-## 3. Resources
+## 3. 
 
 The API is RESTful and arranged around resources. All requests must be made with an integration token. All requests must be made using `https`.
 
