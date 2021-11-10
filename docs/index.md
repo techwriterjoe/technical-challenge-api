@@ -1,6 +1,6 @@
 # Preface
 
-The following documentation is a part of a practice challenge to display the use and understanding of Markdown, Lucid Charts, Swagger tools, the OpenAPI standard, GitHub, and GitHub Pages.
+The following documentation is a part of a practice challenge to display the use and understanding of **Markdown**, **Lucid Charts**, **Swagger tools**, **the OpenAPI standard**, **GitHub**, and **GitHub Pages**.
 
 Here are links to the API reference matierals in swagger:
 
