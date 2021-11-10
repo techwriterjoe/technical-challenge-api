@@ -25,7 +25,7 @@ Example’s API is a JSON-based OAuth2 API. All requests are made to endpoints b
 
 All requests must be secure, i.e. `https`, not `http`.
 
-<div style="width: 640px; height: 480px; margin: 10px; position: relative;"><iframe allowfullscreen frameborder="0" style="width:640px; height:480px" src="https://lucid.app/documents/embeddedchart/ed709c38-53e0-46cd-b303-cfc6bfecefb6" id=".KHqAVJ2E1F6"></iframe></div>
+
 
 
 
