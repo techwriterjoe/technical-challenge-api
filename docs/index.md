@@ -2,6 +2,22 @@
 
 The following documentation is a part of a practice challenge to display the use and understanding of Markdown, Lucid Charts, Swagger tools, the OpenAPI standard, GitHub, and GitHub Pages.
 
+Here are links to the API reference matierals in swagger:
+
+[Shipments](https://app.swaggerhub.com/apis-docs/techwriterjoe_API/shipments/1.0.0)
+
+[Payments](https://app.swaggerhub.com/apis-docs/techwriterjoe_API/payments/1.0.0)
+
+[Orders](https://app.swaggerhub.com/apis-docs/techwriterjoe_API/orders/1.0.0)
+
+[Carts](https://app.swaggerhub.com/apis-docs/techwriterjoe_API/carts/1.0.0)
+
+[Users](https://app.swaggerhub.com/apis-docs/techwriterjoe_API/users/1.0.0)
+
+[Catalog](https://app.swaggerhub.com/apis-docs/techwriterjoe_API/catalogs/1.0.0)
+
+
+
 
 # Example.com’s API documentation
 
